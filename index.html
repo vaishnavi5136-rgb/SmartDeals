@@ -2,13 +2,17 @@
 <html>
 <head>
 <title>SmartDeals</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
 <style>
 
 body{
 font-family:Arial;
 background:#f5f5f5;
 margin:0;
+body{
+padding-bottom:60px;
+}
 }
 
 header{
@@ -20,19 +24,22 @@ font-size:28px;
 font-weight:bold;
 }
   .container{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
-padding:15px;
-
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+padding:10px;
 }
-
+}
 .card{
 background:white;
-padding:15px;
 border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.15);
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+padding:15px;
 text-align:center;
+width:90%;
+max-width:250px;
+margin:10px;
 transition:0.3s;
 }
 
@@ -42,22 +49,133 @@ transform:scale(1.05);
 
 .card img{
 width:100%;
-border-radius:8px;
+border-radius:10px;
 }
 
 .price{
-color:green;
-font-size:18px;
+color:#e63946;
 font-weight:bold;
+font-size:18px;
 }
 
 button{
-background:#ff6b00;
+background:#ff7a18;
 color:white;
 border:none;
-padding:10px 15px;
-border-radius:5px;
-font-weight:bold;
+padding:10px;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff5500;
+}
+.banner{
+background: linear-gradient(90deg,#ff7a18,#ffb347);
+color:white;
+text-align:center;
+padding:40px;
+border-radius:10px;
+margin:15px;
+}
+
+.banner h1{
+margin:0;
+font-size:28px;
+}
+
+.banner p{
+font-size:16px;
+}
+.navbar{
+display:flex;
+justify-content:center;
+background:#222;
+padding:10px;
+}
+
+.navbar{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+background:#222;
+padding:10px;
+}
+
+.navbar a{
+color:white;
+padding:8px 12px;
+text-decoration:none;
+font-size:14px;
+}
+.slider{
+width:100%;
+overflow:hidden;
+margin:20px 0;
+}
+
+.slides{
+display:flex;
+width:300%;
+animation:slide 9s infinite;
+}
+
+.slide{
+width:100%;
+text-align:center;
+}
+
+.slide img{
+width:100%;
+height:200px;
+object-fit:cover;
+border-radius:10px;
+}
+
+@keyframes slide{
+
+0%{margin-left:0;}
+
+33%{margin-left:-100%;}
+
+66%{margin-left:-200%;}
+
+100%{margin-left:0;}
+
+}
+.dark{
+background:#121212;
+color:white;
+}
+
+.dark .card{
+background:#1e1e1e;
+color:white;
+}
+
+.dark .navbar{
+background:#000;
+}
+.bottomNav{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+background:#222;
+display:flex;
+justify-content:space-around;
+padding:10px 0;
+z-index:1000;
+}
+
+.bottomNav a{
+color:white;
+text-decoration:none;
+font-size:14px;
+}
+
+.bottomNav a:hover{
+color:#ff7a18;
 }
 
 </style>
@@ -68,35 +186,484 @@ font-weight:bold;
 
 <header>
 🛍 SmartDeals
-</header>
+<input id="searchBox" placeholder="Search deals..." onkeyup="suggestDeal()" style="width:80%;padding:10px;">
+<div id="suggestions"></div>
+<div style="text-align:center;margin:10px;">
+👀 Visitors on site: <span id="visitorCount">1</span>
+</div>
+<div class="navbar">
+<a href="#">Home</a>
+<a href="#">Gadgets</a>
+<a href="#">Fashion</a>
+<a href="#">Tech</a>
+<a href="#">Best Deals</a>
+<button onclick="toggleDarkMode()" style="margin-left:10px;">
+🌙 Dark Mode
+</button>
+</div>
+<div style="text-align:center; padding:10px;">
+<p>Visitors 👀</p>
 
+<img src="https://hitwebcounter.com/counter/counter.php?page=12345678&style=0006&nbdigits=5&type=page&initCount=0" />
+
+</div>
+<div class="banner">
+<h1>🔥 Mega Deals Today</h1>
+<p>Best gadgets and fashion at lowest prices</p>
+</div>
+<div style="text-align:center; padding:10px;">
+<button onclick="filterDeals('all')">All</button>
+<button onclick="filterDeals('gadgets')">Gadgets</button>
+<button onclick="filterDeals('fashion')">Fashion</button>
+<button onclick="filterDeals('tech')">Tech</button>
+</div>
+<div style="text-align:center; padding:15px;">
+<input type="text" id="searchInput" placeholder="Search deals..." onkeyup="searchDeals()" style="padding:10px; width:80%; border-radius:6px; border:1px solid #ccc;">
+</div>
+<div style="text-align:center">
+
+<img src="https://hitwebcounter.com/counter/counter.php?page=12345678&style=0006&nbdigits=5&type=page&initCount=0">
+
+</div>
+<div id="dealNotification" style="
+position:fixed;
+bottom:20px;
+right:20px;
+background:#ff7a18;
+color:white;
+padding:15px;
+border-radius:10px;
+display:none;
+z-index:1000;">
+🔥 Someone just viewed a hot deal!
+</div>
+</header>
+<h2 style="text-align:center; margin-top:20px;">🔥 Today's Best Deals</h2>
+<h2 style="text-align:center;">⭐ Featured Deals</h2>
+<div class="slider">
+
+<div class="slides">
+
+<div class="slide">
+<img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796">
+<h2>🔥 Earbuds Deal – ₹799</h2>
+</div>
+
+<div class="slide">
+<img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9">
+<h2>⌚ Smart Watch – ₹1299</h2>
+</div>
+
+<div class="slide">
+<img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad">
+<h2>🎧 Gaming Headset – ₹999</h2>
+</div>
+
+</div>
+
+</div>
+<h2 style="text-align:center;">🤖 AI Suggested Deals</h2>
+
+<div style="text-align:center; margin:15px;">
+<button onclick="generateDeals()">Generate Deal Ideas</button>
+</div>
+
+<ul id="aiDeals" style="max-width:500px;margin:auto;font-size:16px;"></ul>
+<h2 style="text-align:center;">🏆 Top 5 Deals Today</h2>
+
+<ol style="max-width:400px;margin:auto;font-size:16px;">
+
+<li>Wireless Earbuds – ₹799</li>
+
+<li>Smart Watch – ₹1299</li>
+
+<li>Gaming Mouse – ₹499</li>
+
+<li>Bluetooth Speaker – ₹999</li>
+
+<li>Power Bank – ₹899</li>
+
+</ol>
+<h2 style="text-align:center;">🔥 Trending Deals</h2>
+
+<div id="trendingDeals" style="text-align:center;font-size:16px;">
+Loading trending deals...
+</div>
 <div class="container">
 
-<div class="card">
-<img src="https://via.placeholder.com/300">
+<div class="card gadgets">
+<img src="https://m.media-amazon.com/images/I/61KNJav3S9L._SL1500_.jpg">
 <h3>Wireless Earbuds</h3>
-<p>High quality Bluetooth earbuds.</p>
+<p style="color:gold;font-size:18px;">
+⭐⭐⭐⭐☆
+</p>
+<p>⏳ Deal ends in: <span id="countdown"></span></p>
+<p style="color:red; font-weight:bold;">🔥 Trending Deal</p>
+<p>Bluetooth earbuds with charging case.</p>
 <p class="price">₹799</p>
-<button>Buy Now</button>
+<a href="https://www.amazon.in" target="_blank">
+<button>Buy Deal</button>
+</a>
+<button onclick="saveDeal()">❤️ Save Deal</button>
 </div>
 
-<div class="card">
-<img src="https://via.placeholder.com/300">
+<div class="card fashion">
+<img src="https://m.media-amazon.com/images/I/61y2VVWcGBL._SL1500_.jpg">
 <h3>Smart Watch</h3>
+<p style="color:gold;font-size:18px;">
+⭐⭐⭐⭐☆
+</p>
+<p>⏳ Deal ends in: <span id="countdown"></span></p>
 <p>Fitness tracking smartwatch.</p>
 <p class="price">₹1299</p>
-<button>Buy Now</button>
+<a href="https://www.amazon.in" target="_blank">
+<button>Buy Deal</button>
+</a>
+<button onclick="saveDeal()">❤️ Save Deal</button>
 </div>
 
-<div class="card">
-<img src="https://via.placeholder.com/300">
+<div class="card tech">
+<img src="https://m.media-amazon.com/images/I/61LtuGzXeaL._SL1500_.jpg">
 <h3>Gaming Mouse</h3>
-<p>RGB gaming mouse with high precision.</p>
+<p style="color:gold;font-size:18px;">
+⭐⭐⭐⭐☆
+</p>
+<p>⏳ Deal ends in: <span id="countdown"></span></p>
+<p>RGB gaming mouse with precision sensor.</p>
 <p class="price">₹499</p>
+<a href="https://www.amazon.in" target="_blank">
+<button>Buy Deal</button>
+</a>
+<button onclick="saveDeal()">❤️ Save Deal</button>
+</div>
+
+</div>
+<script>
+  function searchDeals(){
+let input=document.getElementById("searchInput").value.toLowerCase();
+let cards=document.getElementsByClassName("card");
+
+for(let i=0;i<cards.length;i++){
+let title=cards[i].getElementsByTagName("h3")[0].innerText.toLowerCase();
+
+if(title.includes(input)){
+cards[i].style.display="block";
+}else{
+cards[i].style.display="none";
+}
+}
+}
+</script>
+<script>
+  function filterDeals(category){
+let cards=document.getElementsByClassName("card");
+
+for(let i=0;i<cards.length;i++){
+if(category=="all"){
+cards[i].style.display="block";
+}
+else if(cards[i].classList.contains(category)){
+cards[i].style.display="block";
+}
+else{
+cards[i].style.display="none";
+}
+}
+}
+</script>
+<script>
+
+function saveDeal(){
+alert("Deal saved to wishlist ❤️");
+}
+
+</script>
+<h2 style="text-align:center">Contact Us</h2>
+
+<div style="text-align:center">
+
+<input type="text" placeholder="Your Name"><br><br>
+
+<input type="email" placeholder="Your Email"><br><br>
+
+<textarea placeholder="Your message"></textarea><br><br>
+
+<button onclick="sendMessage()">Send</button>
+
+</div>
+<script>
+
+function sendMessage(){
+alert("Thank you! Your message was sent.");
+}
+
+</script>
+<script>
+
+function generateDeals(){
+
+let deals=[
+"Wireless Earbuds under ₹800",
+"Smartwatch with fitness tracking under ₹1500",
+"Gaming Mouse under ₹500",
+"Bluetooth Speaker under ₹1000",
+"Phone stand and accessories bundle under ₹300",
+"Budget headphones for students under ₹700",
+"Portable charger under ₹1200"
+];
+
+let list=document.getElementById("aiDeals");
+
+list.innerHTML="";
+
+for(let i=0;i<3;i++){
+
+let randomDeal=deals[Math.floor(Math.random()*deals.length)];
+
+let li=document.createElement("li");
+
+li.innerText=randomDeal;
+
+list.appendChild(li);
+
+}
+
+}
+
+</script>
+<script>
+
+function toggleDarkMode(){
+document.body.classList.toggle("dark");
+}
+
+</script>
+<script>
+
+setInterval(function(){
+let notification=document.getElementById("dealNotification");
+
+notification.style.display="block";
+
+setTimeout(function(){
+notification.style.display="none";
+},3000);
+
+},15000);
+
+</script>
+<script>
+
+let timeLeft=3600;
+
+let timer=setInterval(function(){
+
+let minutes=Math.floor(timeLeft/60);
+let seconds=timeLeft%60;
+
+document.getElementById("countdown").innerHTML=
+minutes+"m "+seconds+"s";
+
+timeLeft--;
+
+if(timeLeft<0){
+clearInterval(timer);
+document.getElementById("countdown").innerHTML="Expired";
+}
+
+},1000);
+
+</script>
+<div id="chatButton" onclick="toggleChat()" style="
+position:fixed;
+bottom:20px;
+left:20px;
+background:#ff7a18;
+color:white;
+padding:12px 16px;
+border-radius:20px;
+cursor:pointer;
+z-index:1000;">
+💬 Deals Bot
+</div>
+<div id="chatBox" style="
+display:none;
+position:fixed;
+bottom:70px;
+left:20px;
+width:250px;
+background:white;
+border:1px solid #ccc;
+border-radius:10px;
+padding:10px;
+z-index:1000;">
+
+<p><b>Deals Bot 🤖</b></p>
+
+<div id="chatMessages" style="height:120px;overflow:auto;font-size:14px;"></div>
+
+<input id="userInput" type="text" placeholder="Ask for a deal..."
+style="width:100%;margin-top:5px;">
+
+<button onclick="sendMessage()" style="width:100%;margin-top:5px;">
+Send
+</button>
+
+</div>
+<script>
+
+function toggleChat(){
+let box=document.getElementById("chatBox");
+box.style.display=(box.style.display==="none")?"block":"none";
+}
+
+function sendMessage(){
+
+let input=document.getElementById("userInput").value.toLowerCase();
+let chat=document.getElementById("chatMessages");
+
+let response="Try searching our latest deals!";
+
+if(input.includes("earbuds")){
+response="🔥 Check out Wireless Earbuds under ₹800!";
+}
+
+else if(input.includes("watch")){
+response="⌚ Smartwatch deals starting at ₹1299.";
+}
+
+else if(input.includes("mouse")){
+response="🎮 Gaming mouse deals under ₹500 available!";
+}
+
+chat.innerHTML+="<p><b>You:</b> "+input+"</p>";
+chat.innerHTML+="<p><b>Bot:</b> "+response+"</p>";
+
+document.getElementById("userInput").value="";
+
+}
+
+</script>
+<h2 style="text-align:center;">⚙ Add New Deal (Admin)</h2>
+
+<div style="text-align:center;margin:20px;">
+
+<input id="dealName" placeholder="Product name"><br><br>
+
+<input id="dealPrice" placeholder="Price"><br><br>
+
+<input id="dealImage" placeholder="Image URL"><br><br>
+
+<button onclick="addDeal()">Add Deal</button>
+
+</div>
+<script>
+
+function addDeal(){
+
+let name=document.getElementById("dealName").value;
+
+let price=document.getElementById("dealPrice").value;
+
+let image=document.getElementById("dealImage").value;
+
+let container=document.querySelector(".container");
+
+let card=document.createElement("div");
+
+card.className="card";
+
+card.innerHTML=`
+<img src="${image}">
+<h3>${name}</h3>
+<p class="price">₹${price}</p>
 <button>Buy Now</button>
-</div>
+`;
+
+container.appendChild(card);
+
+}
+
+</script>
+<div class="bottomNav">
+
+<a href="#">🏠 Home</a>
+
+<a href="#">🔥 Deals</a>
+
+<a href="#">❤️ Saved</a>
+
+<a href="#">⚙ Admin</a>
 
 </div>
+<script>
 
+let trending=[
+"🔥 Earbuds under ₹800 are trending!",
+"⌚ Smartwatch deals are popular today!",
+"🎧 Gaming accessories are selling fast!",
+"🔋 Power banks under ₹1000 trending!"
+];
+
+function showTrending(){
+
+let random=trending[Math.floor(Math.random()*trending.length)];
+
+document.getElementById("trendingDeals").innerHTML=random;
+
+}
+
+setInterval(showTrending,5000);
+
+showTrending();
+
+</script>
+<script>
+
+let visitors = Math.floor(Math.random()*20)+5;
+
+document.getElementById("visitorCount").innerText = visitors;
+
+setInterval(function(){
+
+visitors += Math.floor(Math.random()*3);
+
+document.getElementById("visitorCount").innerText = visitors;
+
+},5000);
+
+</script>
+<script>
+
+let deals = [
+"Wireless Earbuds",
+"Smart Watch",
+"Gaming Mouse",
+"Bluetooth Speaker",
+"Power Bank",
+"Laptop Cooling Pad"
+];
+
+function suggestDeal(){
+
+let input = document.getElementById("searchBox").value.toLowerCase();
+
+let suggestions="";
+
+for(let i=0;i<deals.length;i++){
+
+if(deals[i].toLowerCase().includes(input)){
+
+suggestions += "<p>"+deals[i]+"</p>";
+
+}
+
+}
+
+document.getElementById("suggestions").innerHTML = suggestions;
+
+}
+
+</script>
 </body>
 </html>
